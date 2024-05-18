@@ -77,6 +77,21 @@ function! s:persist() abort
       let body = readfile(tmp)
       call insert(body, 'let g:this_session = v:this_session', -3)
       call insert(body, 'let g:this_obsession = v:this_session', -3)
+      if type(get(g:, 'obsession_prepend')) == type([])
+        for l:Item in g:obsession_prepend
+          if type(l:Item) == v:t_string
+            call insert(body, l:Item)
+          elseif type(l:Item) == v:t_list
+            for l:line in reverse(l:Item)
+              call insert(body, l:line)
+            endfor
+          elseif type(l:Item) == v:t_func
+            for l:line in reverse(l:Item())
+              call insert(body, l:line)
+            endfor
+          endif
+        endfor
+      endif
       if type(get(g:, 'obsession_append')) == type([])
         for line in g:obsession_append
           call insert(body, line, -3)
