@@ -78,16 +78,23 @@ function! s:persist() abort
       call insert(body, 'let g:this_session = v:this_session', -3)
       call insert(body, 'let g:this_obsession = v:this_session', -3)
       if type(get(g:, 'obsession_prepend')) == type([])
+        let l:idx = 0
+        for l:i in range(0, len(body) - 1)
+          if match(body[l:i], "if &shortmess =\\~ 'A'") == 0
+            let l:idx = l:i + 5 " place after the `shortmess` if-else-block
+            break
+          endif
+        endfor
         for l:Item in g:obsession_prepend
           if type(l:Item) == v:t_string
-            call insert(body, l:Item)
+            call insert(body, l:Item, l:idx)
           elseif type(l:Item) == v:t_list
             for l:line in reverse(l:Item)
-              call insert(body, l:line)
+              call insert(body, l:line, l:idx)
             endfor
           elseif type(l:Item) == v:t_func
             for l:line in reverse(l:Item())
-              call insert(body, l:line)
+              call insert(body, l:line, l:idx)
             endfor
           endif
         endfor
